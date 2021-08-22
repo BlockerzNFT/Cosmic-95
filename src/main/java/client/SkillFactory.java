@@ -40,8 +40,8 @@ public class SkillFactory {
 
     public static void loadAllSkills() {
         final Map<Integer, Skill> loadedSkills = new HashMap<>();
-        final MapleDataDirectoryEntry root = datasource.getRoot();
-        for (MapleDataFileEntry topDir : root.getFiles()) { // Loop thru jobs
+        final MapleData root = datasource.getRoot();
+        for (MapleData topDir : root) { // Loop thru jobs
             if (topDir.getName().length() <= 8) {
                 for (MapleData data : datasource.getData(topDir.getName())) { // Loop thru each jobs
                     if (data.getName().equals("skill")) {

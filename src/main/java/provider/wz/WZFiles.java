@@ -17,12 +17,12 @@ public enum WZFiles {
     SOUND("Sound"),
     UI("UI");
 
-    public static final String DIRECTORY = "wz";
+    public static final String DIRECTORY = "nx";
 
     private final String fileName;
 
     WZFiles(String name) {
-        this.fileName = name + ".wz";
+        this.fileName = name + ".nx";
     }
 
     public File getFile() {

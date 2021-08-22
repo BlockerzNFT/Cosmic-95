@@ -25,7 +25,7 @@ import provider.MapleData;
 import provider.MapleDataProvider;
 import provider.MapleDataProviderFactory;
 import provider.MapleDataTool;
-import provider.wz.MapleDataType;
+import provider.MapleDataType;
 import provider.wz.WZFiles;
 import tools.Pair;
 import tools.StringUtil;
@@ -47,7 +47,7 @@ public class MapleLifeFactory {
         Set<Integer> ret = new HashSet<>();
         
         MapleDataProvider uiDataWZ = MapleDataProviderFactory.getDataProvider(WZFiles.UI);
-        for (MapleData bossData : uiDataWZ.getData("UIWindow.img").getChildByPath("MobGage/Mob").getChildren()) {
+        for (MapleData bossData : uiDataWZ.getData("UIWindow.img").resolve("MobGage/Mob")) {
             ret.add(Integer.valueOf(bossData.getName()));
         }
         

@@ -163,10 +163,10 @@ public class NoItemNameFetcher {
         };
     }
 
-    private static void readEquipNodeData(MapleDataProvider data, MapleDataDirectoryEntry mDir, String wzFileName, String dirName) {
+    private static void readEquipNodeData(MapleDataProvider data, MapleData mDir, String wzFileName, String dirName) {
         EquipType eqType = getEquipTypeFromDirectoryName(dirName);
 
-        for (MapleDataFileEntry mFile : mDir.getFiles()) {
+        for (MapleData mFile : mDir) {
             String fileName = mFile.getName();
 
             try {
@@ -196,10 +196,10 @@ public class NoItemNameFetcher {
         String wzFileName = "Character.wz";
 
         MapleDataProvider data = MapleDataProviderFactory.getDataProvider(WZFiles.CHARACTER);
-        MapleDataDirectoryEntry root = data.getRoot();
+        MapleData root = data.getRoot();
 
         System.out.println("Parsing " + wzFileName + "...");
-        for (MapleDataDirectoryEntry mDir : root.getSubdirectories()) {
+        for (MapleData mDir : root) {
             String dirName = mDir.getName();
             if (dirName.contentEquals("Dragon")) {
                 continue;
@@ -213,10 +213,10 @@ public class NoItemNameFetcher {
         String wzFileName = "Item.wz";
 
         MapleDataProvider data = MapleDataProviderFactory.getDataProvider(WZFiles.ITEM);
-        MapleDataDirectoryEntry root = data.getRoot();
+        MapleData root = data.getRoot();
 
         System.out.println("Parsing " + wzFileName + "...");
-        for (MapleDataDirectoryEntry mDir : root.getSubdirectories()) {
+        for (MapleData mDir : root) {
             String dirName = mDir.getName();
             if (dirName.contentEquals("Special")) {
                 continue;
@@ -224,7 +224,7 @@ public class NoItemNameFetcher {
 
             curType = getItemTypeFromDirectoryName(dirName);
             if (!dirName.contentEquals("Pet")) {
-                for (MapleDataFileEntry mFile : mDir.getFiles()) {
+                for (MapleData mFile : mDir) {
                     String fileName = mFile.getName();
 
                     MapleData fileData = data.getData(dirName + "/" + fileName);

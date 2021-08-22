@@ -270,9 +270,9 @@ public class MapleItemInformationProvider {
     private MapleData getItemData(int itemId) {
         MapleData ret = null;
         String idStr = "0" + String.valueOf(itemId);
-        MapleDataDirectoryEntry root = itemData.getRoot();
-        for (MapleDataDirectoryEntry topDir : root.getSubdirectories()) {
-            for (MapleDataFileEntry iFile : topDir.getFiles()) {
+        MapleData root = itemData.getRoot();
+        for (MapleData topDir : root) {
+            for (MapleData iFile : topDir) {
                 if (iFile.getName().equals(idStr.substring(0, 4) + ".img")) {
                     ret = itemData.getData(topDir.getName() + "/" + iFile.getName());
                     if (ret == null) {
@@ -286,8 +286,8 @@ public class MapleItemInformationProvider {
             }
         }
         root = equipData.getRoot();
-        for (MapleDataDirectoryEntry topDir : root.getSubdirectories()) {
-            for (MapleDataFileEntry iFile : topDir.getFiles()) {
+        for (MapleData topDir : root) {
+            for (MapleData iFile : topDir) {
                 if (iFile.getName().equals(idStr + ".img")) {
                     return equipData.getData(topDir.getName() + "/" + iFile.getName());
                 }
@@ -1304,26 +1304,33 @@ public class MapleItemInformationProvider {
         return new Pair<>(ret, retSkill);
     }
 
-    public Map<String, Integer> getSkillStats(int itemId, double playerJob) {
-        Pair<Map<String, Integer>, MapleData> retData = getSkillStatsInternal(itemId);
-        if(retData.getLeft().isEmpty()) return null;
-
-        Map<String, Integer> ret = new LinkedHashMap<>(retData.getLeft());
-        MapleData skill = retData.getRight();
-        int curskill;
-        for (int i = 0; i < skill.getChildren().size(); i++) {
-            curskill = MapleDataTool.getInt(Integer.toString(i), skill, 0);
-            if (curskill == 0) {
-                break;
+    public Map<String, Integer> getSkillStats(int itemId, int playerJob) {
+        final Map<String, Integer> ret = new LinkedHashMap<>();
+        MapleData item = getItemData(itemId);
+        if (item == null) {
+            return ret;
+        }
+        MapleData info = item.getChildByPath("info");
+        if (info == null) {
+            return ret;
+        }
+        for (MapleData data : info) {
+            if (data.getName().startsWith("inc")) {
+                ret.put(data.getName().substring(3), MapleDataTool.getInt(data));
             }
-            if (curskill / 10000 == playerJob) {
-                ret.put("skillid", curskill);
+        }
+        ret.put("masterLevel", MapleDataTool.getInt(info.resolve("masterLevel"), 0));
+        ret.put("reqSkillLevel", MapleDataTool.getInt(info.resolve("reqSkillLevel"), 0));
+        ret.put("success", MapleDataTool.getInt(info.resolve("success"), 0));
+        MapleData skillIds = info.getChildByPath("skill");
+        for (MapleData skillId : skillIds) {
+            int cSkillId = MapleDataTool.getInt(skillId);
+            if (cSkillId / 10000 == playerJob) {
+                ret.put("skillid", cSkillId);
                 break;
             }
         }
-        if (ret.get("skillid") == null) {
-            ret.put("skillid", 0);
-        }
+        ret.putIfAbsent("skillid", 0);
         return ret;
     }
 
@@ -1337,7 +1344,7 @@ public class MapleItemInformationProvider {
             MapleData data = getItemData(itemId);
             if(data != null) {
                 MapleData specData = data.getChildByPath("spec");
-                for(MapleData specItem : specData.getChildren()) {
+                for(MapleData specItem : specData) {
                     String itemName = specItem.getName();
 
                     try {

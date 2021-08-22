@@ -679,13 +679,13 @@ public class GameConstants {
         MapleDataProvider mapSource = MapleDataProviderFactory.getDataProvider(WZFiles.MAP);
         int maxMobDmg = 0;
         
-        MapleDataDirectoryEntry root = mapSource.getRoot();
-        for (MapleDataDirectoryEntry objData : root.getSubdirectories()) {
+        MapleData root = mapSource.getRoot();
+        for (MapleData objData : root) {
             if (!objData.getName().contentEquals("Obj")) {
                 continue;
             }
-            
-            for (MapleDataFileEntry obj : objData.getFiles()) {
+
+            for (MapleData obj : root) {
                 for (MapleData l0 : mapSource.getData(objData.getName() + "/" + obj.getName()).getChildren()) {
                     for (MapleData l1 : l0.getChildren()) {
                         for (MapleData l2 : l1.getChildren()) {
@@ -698,7 +698,6 @@ public class GameConstants {
                 }
             }
         }
-        
         return maxMobDmg;
     }
     

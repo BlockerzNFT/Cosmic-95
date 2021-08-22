@@ -141,7 +141,7 @@ public class MapleMapFactory {
         float monsterRate = 0;
         MapleData mobRate = infoData.getChildByPath("mobRate");
         if (mobRate != null) {
-            monsterRate = (Float) mobRate.getData();
+            monsterRate = MapleDataTool.getFloat(mobRate);
         }
         map = new MapleMap(mapid, world, channel, MapleDataTool.getInt("returnMap", infoData), monsterRate);
         map.setEventInstance(event);
@@ -164,8 +164,8 @@ public class MapleMapFactory {
         }
 
         int[] bounds = new int[4];
-        bounds[0] = MapleDataTool.getInt(infoData.getChildByPath("VRTop"));
-        bounds[1] = MapleDataTool.getInt(infoData.getChildByPath("VRBottom"));
+//        bounds[0] = MapleDataTool.getInt(infoData.getChildByPath("VRTop"));
+//        bounds[1] = MapleDataTool.getInt(infoData.getChildByPath("VRBottom"));
 
         if (bounds[0] == bounds[1]) {    // old-style baked map
             MapleData minimapData = mapData.getChildByPath("miniMap");
@@ -417,7 +417,7 @@ public class MapleMapFactory {
     
     public static String loadPlaceName(int mapid) {
         try {
-            return MapleDataTool.getString("mapName", nameData.getChildByPath(getMapStringName(mapid)), "");
+            return MapleDataTool.getString(nameData.getChildByPath(getMapStringName(mapid)).resolve("mapName"), "");
         } catch (Exception e) {
             return "";
         }
@@ -425,7 +425,7 @@ public class MapleMapFactory {
     
     public static String loadStreetName(int mapid) {
         try {
-            return MapleDataTool.getString("streetName", nameData.getChildByPath(getMapStringName(mapid)), "");
+            return MapleDataTool.getString("streetName", nameData.getChildByPath(getMapStringName(mapid)).resolve("streetName"), "");
         } catch (Exception e) {
             return "";
         }

@@ -21,27 +21,29 @@
 */
 package provider;
 
-import provider.wz.WZFile;
-import provider.wz.WZFiles;
-import provider.wz.XMLWZFile;
-
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import provider.nx.NXDataProvider;
+import provider.wz.WZFiles;
 
 public class MapleDataProviderFactory {
-    private static MapleDataProvider getWZ(File in) {
-        if (in.getName().toLowerCase().endsWith("wz") && !in.isDirectory()) {
-            try {
-                return new WZFile(in, false);
-            } catch (IOException e) {
-                throw new RuntimeException("Loading WZ File failed", e);
-            }
-        } else {
-            return new XMLWZFile(in);
+
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(MapleDataProviderFactory.class);
+    private final static Path nxPath = Paths.get(System.getProperty("user.dir")+"/nx").toAbsolutePath();
+
+    public static MapleDataProvider getDataProvider(WZFiles wzName) {
+        try {
+            String name = wzName.toString();
+            return NXDataProvider.openFile(name.concat(".nx"));
+        } catch (IOException ioe) {
+            log.error("Failed to open NX file.", ioe);
         }
+        return null;
     }
 
-    public static MapleDataProvider getDataProvider(WZFiles in) {
-        return getWZ(in.getFile());
+    public static Path resolvePath(Path relative) {
+        return nxPath.resolve(relative);
     }
 }

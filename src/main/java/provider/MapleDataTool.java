@@ -21,21 +21,24 @@
 */
 package provider;
 
-import provider.wz.MapleDataType;
+import provider.MapleDataType;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
 public class MapleDataTool {
     public static String getString(MapleData data) {
-        return ((String) data.getData());
+        return (String) data.getData();
     }
 
     public static String getString(MapleData data, String def) {
-        if (data == null || data.getData() == null) {
+        if (data == null) {
             return def;
-        } else {
-            return ((String) data.getData());
+        }
+        try {
+            return getString(data);
+        } catch (Exception e) {
+            return def;
         }
     }
 
@@ -51,15 +54,45 @@ public class MapleDataTool {
         return (Double) data.getData();
     }
 
-    public static float getFloat(MapleData data) {
-        return (Float) data.getData();
+    public static double getDouble(MapleData data, double def) {
+        if (data == null) {
+            return def;
+        }
+        try {
+            return getDouble(data);
+        } catch (Exception e) {
+            return def;
+        }
     }
 
-    public static int getInt(MapleData data) {
-        if (data == null || data.getData() == null) {
-            return 0;// DEF?
+    public static float toFloat(MapleData data, float def) {
+        if (data == null) {
+            return def;
         }
-        return (Integer) data.getData();
+        try {
+            return getFloat(data);
+        } catch (Exception e) {
+            return def;
+        }
+    }
+
+    public static float getFloat(MapleData data) {
+        Object ret = data.getData();
+        if (ret instanceof Double) {
+            return ((Double) ret).floatValue();
+        } else {
+            return (Float) ret;
+        }
+    }
+    public static int getInt(MapleData data) {
+        Object ret = data.getData();
+        if (ret instanceof Long) {
+            return ((Long) ret).intValue();
+        } else if (ret instanceof String) {
+            return Integer.parseInt((String) ret);
+        } else {
+            return (Integer) ret;
+        }
     }
 
     public static int getInt(String path, MapleData data) {
@@ -103,17 +136,24 @@ public class MapleDataTool {
     }
 
     public static int getInt(MapleData data, int def) {
-        if (data == null || data.getData() == null) {
-            return  def;
-        } else if (data.getType() == MapleDataType.STRING) {
-            return Integer.parseInt(getString(data));
+        if (data == null) {
+            return def;
+        }
+        try {
+            return toInt(data);
+        } catch (Exception e) {
+            return def;
+        }
+    }
+
+    public static int toInt(MapleData data) {
+        Object ret = data.getData();
+        if (ret instanceof Long) {
+            return ((Long) ret).intValue();
+        } else if (ret instanceof String) {
+            return Integer.parseInt((String) ret);
         } else {
-            Object numData = data.getData();
-            if (numData instanceof Integer) {
-                return (Integer) numData;
-            } else {
-                return (Short) numData;
-            }
+            return (Integer) ret;
         }
     }
 

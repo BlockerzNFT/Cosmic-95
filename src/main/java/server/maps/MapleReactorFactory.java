@@ -56,7 +56,7 @@ public class MapleReactorFactory {
                 if (reactorData == null) {
                     return stats;
                 }
-                boolean canTouch = MapleDataTool.getInt("info/activateByTouch", reactorData, 0) > 0;
+                boolean canTouch = MapleDataTool.getInt(reactorData.resolve("info/activateByTouch"), 0) > 0;
                 boolean areaSet = false;
                 boolean foundState = false;
                 for (byte i = 0; true; i++) {
@@ -122,7 +122,7 @@ public class MapleReactorFactory {
                         if (eventData != null) {
                             int timeOut = -1;
                             
-                            for (MapleData fknexon : eventData.getChildren()) {
+                            for (MapleData fknexon : eventData) {
                                 if (fknexon.getName().equalsIgnoreCase("timeOut")) {
                                     timeOut = MapleDataTool.getInt(fknexon);
                                 } else {
@@ -140,7 +140,7 @@ public class MapleReactorFactory {
                                     List<Integer> skillids = null;
                                     if (activeSkillID != null) {
                                         skillids = new ArrayList<>();
-                                        for (MapleData skill : activeSkillID.getChildren()) {
+                                        for (MapleData skill : activeSkillID) {
                                             skillids.add(MapleDataTool.getInt(skill));
                                         }
                                     }

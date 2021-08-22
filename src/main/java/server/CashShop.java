@@ -153,7 +153,7 @@ public class CashShop {
 
             Map<Integer, CashItem> loadedItems = new HashMap<>();
             List<Integer> onSaleItems = new ArrayList<>();
-            for (MapleData item : etc.getData("Commodity.img").getChildren()) {
+            for (MapleData item : etc.getData("Commodity.img")) {
                 int sn = MapleDataTool.getIntConvert("SN", item);
                 int itemId = MapleDataTool.getIntConvert("ItemId", item);
                 int price = MapleDataTool.getIntConvert("Price", item, 0);

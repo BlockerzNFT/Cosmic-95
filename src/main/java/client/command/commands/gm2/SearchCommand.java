@@ -85,7 +85,7 @@ public class SearchCommand extends Command {
                 String name;
                 
                 if (searchType == 0) {
-                    for (MapleData searchData : data.getChildren()) {
+                    for (MapleData searchData : data) {
                         name = MapleDataTool.getString(searchData.getChildByPath("name"), "NO-NAME");
                         if (name.toLowerCase().contains(search.toLowerCase())) {
                             sb.append("#b").append(Integer.parseInt(searchData.getName())).append("#k - #r").append(name).append("\r\n");
@@ -94,8 +94,8 @@ public class SearchCommand extends Command {
                 } else if (searchType == 1) {
                     String mapName, streetName;
                     
-                    for (MapleData searchDataDir : data.getChildren()) {
-                        for (MapleData searchData : searchDataDir.getChildren()) {
+                    for (MapleData searchDataDir : data) {
+                        for (MapleData searchData : searchDataDir) {
                             mapName = MapleDataTool.getString(searchData.getChildByPath("mapName"), "NO-NAME");
                             streetName = MapleDataTool.getString(searchData.getChildByPath("streetName"), "NO-NAME");
                             

@@ -1,7 +1,7 @@
 package tools.mapletools;
 
 import provider.*;
-import provider.wz.MapleDataType;
+import provider.MapleDataType;
 import provider.wz.WZFiles;
 import server.life.Element;
 import server.life.ElementalEffectiveness;
@@ -20,10 +20,10 @@ public class MonsterStatFetcher {
     private static final Map<Integer, MapleMonsterStats> monsterStats = new HashMap<>();
 
     static Map<Integer, MapleMonsterStats> getAllMonsterStats() {
-        MapleDataDirectoryEntry root = data.getRoot();
+        MapleData root = data.getRoot();
 
         System.out.print("Parsing mob stats... ");
-        for (MapleDataFileEntry mFile : root.getFiles()) {
+        for (MapleData mFile : root) {
             try {
                 String fileName = mFile.getName();
 
