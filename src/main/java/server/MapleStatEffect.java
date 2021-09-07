@@ -144,7 +144,6 @@ public class MapleStatEffect {
         
         return 0;
     }
-    
     public static MapleStatEffect loadSkillEffectFromData(MapleData source, int skillid, boolean overtime) {
         return loadFromData(source, skillid, true, overtime);
     }

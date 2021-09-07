@@ -428,7 +428,7 @@ public final class PlayerLoggedinHandler extends AbstractMaplePacketHandler {
                     npcsIds.put(YamlConfig.config.server.REBIRTH_NPC_ID, "Rebirth");
                 }
 
-                c.sendPacket(PacketCreator.setNPCScriptable(npcsIds));
+//                c.sendPacket(PacketCreator.setNPCScriptable(npcsIds)); TODO
             }
 
             if (newcomer) player.setLoginTime(System.currentTimeMillis());

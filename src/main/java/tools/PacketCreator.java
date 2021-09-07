@@ -152,10 +152,10 @@ public class PacketCreator {
         p.writeShort(chr.getDex()); // dex
         p.writeShort(chr.getInt()); // int
         p.writeShort(chr.getLuk()); // luk
-        p.writeShort(chr.getHp()); // hp (?)
-        p.writeShort(chr.getClientMaxHp()); // maxhp
-        p.writeShort(chr.getMp()); // mp (?)
-        p.writeShort(chr.getClientMaxMp()); // maxmp
+        p.writeInt(chr.getHp()); // hp (?)
+        p.writeInt(chr.getClientMaxHp()); // maxhp
+        p.writeInt(chr.getMp()); // mp (?)
+        p.writeInt(chr.getClientMaxMp()); // maxmp
         p.writeShort(chr.getRemainingAp()); // remaining ap
         if (GameConstants.hasSPTable(chr.getJob())) {
             addRemainingSkillInfo(p, chr);
@@ -167,20 +167,23 @@ public class PacketCreator {
         p.writeInt(chr.getGachaExp()); //Gacha Exp
         p.writeInt(chr.getMapId()); // current map id
         p.writeByte(chr.getInitialSpawnpoint()); // spawnpoint
-        p.writeInt(0);
+        p.writeInt(0); // Play time
+//        p.writeShort(chr.isDualBlade() ? 1 : 0);
+        p.writeShort(0); // Subjob
     }
 
     protected static void addCharLook(final OutPacket p, MapleCharacter chr, boolean mega) {
         p.writeByte(chr.getGender());
         p.writeByte(chr.getSkinColor().getId()); // skin color
         p.writeInt(chr.getFace()); // face
-        p.writeBool(!mega);
+        p.writeBool(mega);
         p.writeInt(chr.getHair()); // hair
         addCharEquips(p, chr);
     }
 
     private static void addCharacterInfo(OutPacket p, MapleCharacter chr) {
         p.writeLong(-1);
+        p.writeByte(0);
         p.writeByte(0);
         addCharStats(p, chr);
         p.writeByte(chr.getBuddylist().getCapacity());
@@ -193,16 +196,25 @@ public class PacketCreator {
         }
 
         p.writeInt(chr.getMeso());
+        p.writeBytes(new byte[2000]);
         addInventoryInfo(p, chr);
         addSkillInfo(p, chr);
         addQuestInfo(p, chr);
         addMiniGameInfo(p, chr);
         addRingInfo(p, chr);
         addTeleportInfo(p, chr);
-        addMonsterBookInfo(p, chr);
+//        addMonsterBookInfo(p, chr);
         addNewYearInfo(p, chr);
-        addAreaInfo(p, chr);//assuming it stayed here xd
-        p.writeShort(0);
+//        addAreaInfo(p, chr);//assuming it stayed here xd
+        p.writeShort(0); // QREX
+        if(chr.getJob().getId() / 100 == 33) { // Wild Hunter Shit
+            p.writeByte(0);
+            for (int i = 0; i < 5; i++) {
+                p.writeInt(0);
+            }
+        }
+        p.writeShort(0); // QuestCompleteOld
+        p.writeShort(0); // visitorlog
     }
 
     private static void addNewYearInfo(OutPacket p, MapleCharacter chr) {
@@ -213,6 +225,8 @@ public class PacketCreator {
             encodeNewYearCard(nyc, p);
         }
     }
+
+
 
     private static void addTeleportInfo(OutPacket p, MapleCharacter chr) {
         final List<Integer> tele = chr.getTrockMaps();
@@ -417,7 +431,7 @@ public class PacketCreator {
         p.writeShort(equip.getJump()); // jump
         p.writeString(equip.getOwner()); // owner name
         p.writeShort(equip.getFlag()); //Item Flags
-
+        p.writeByte(0);
         if (isCash) {
             for (int i = 0; i < 10; i++) {
                 p.writeByte(0x40);
@@ -427,12 +441,23 @@ public class PacketCreator {
 
             long expNibble = (ExpTable.getExpNeededForLevel(ii.getEquipLevelReq(item.getItemId())) * equip.getItemExp());
             expNibble /= ExpTable.getEquipExpNeededForLevel(itemLevel);
-
-            p.writeByte(0);
             p.writeByte(itemLevel); //Item Level
+            p.writeShort(0);
+            p.writeShort(0);
+            p.writeInt(-1);
+            p.writeInt(0); // getVicious
+            p.writeByte(0); // isPotentialByte
+            p.writeByte(0); // getStarsByte
+            p.writeShort(0); // Pot stat 1
+            p.writeShort(0); // Pot Stat 2
+            p.writeShort(0); // Pot Stat 2
+            p.writeLong(-1);
             p.writeInt((int) expNibble);
             p.writeInt(equip.getVicious()); //WTF NEXON ARE YOU SERIOUS?
             p.writeLong(0);
+            p.writeInt(0);
+            p.writeShort(0);
+
         }
         p.writeLong(getTime(-2));
         p.writeInt(-1);
@@ -466,6 +491,11 @@ public class PacketCreator {
         for (Item item : chr.getInventory(MapleInventoryType.EQUIP).list()) {
             addItemInfo(p, item);
         }
+
+        p.writeShort(0);
+        p.writeShort(0); // 0.88 - Dragon Equip.
+        p.writeShort(0); // 0.94 - Mechanic Equip
+
         p.writeInt(0);
         for (Item item : chr.getInventory(MapleInventoryType.USE).list()) {
             addItemInfo(p, item);
@@ -549,8 +579,7 @@ public class PacketCreator {
         OutPacket p = new ByteBufOutPacket();
         p.writeShort(0x0E);
         p.writeShort(mapleVersion);
-        p.writeShort(1);
-        p.writeByte(49);
+        p.writeString("1");
         p.writeBytes(recvIv.getBytes());
         p.writeBytes(sendIv.getBytes());
         p.writeByte(8);
@@ -661,27 +690,34 @@ public class PacketCreator {
         Server.getInstance().loadAccountStorages(c);
 
         final OutPacket p = OutPacket.create(SendOpcode.LOGIN_STATUS);
+        p.writeByte(0); // wss short
+        p.writeByte(0); // wss short
         p.writeInt(0);
-        p.writeShort(0);
         p.writeInt(c.getAccID());
         p.writeByte(c.getGender());
 
         boolean canFly = Server.getInstance().canFly(c.getAccID());
         p.writeBool((YamlConfig.config.server.USE_ENFORCE_ADMIN_ACCOUNT || canFly) && c.getGMLevel() > 1);    // thanks Steve(kaito1410) for pointing the GM account boolean here
-        p.writeByte(((YamlConfig.config.server.USE_ENFORCE_ADMIN_ACCOUNT || canFly) && c.getGMLevel() > 1) ? 0x80 : 0);  // Admin Byte. 0x80,0x40,0x20.. Rubbish.
+//        p.writeByte(0);  // Admin Byte. 0x80,0x40,0x20.. Rubbish.
+        p.writeShort(0);
         p.writeByte(0); // Country Code.
+//        p.writeByte(0);
 
         p.writeString(c.getAccountName());
         p.writeByte(0);
-
         p.writeByte(0); // IsQuietBan
         p.writeLong(0);//IsQuietBanTimeStamp
         p.writeLong(0); //CreationTimeStamp
 
-        p.writeInt(1); // 1: Remove the "Select the world you want to play in"
+        p.writeInt(0); //num of character
+        p.writeByte(1); // v44
+        p.writeByte(0); //sMsg
 
-        p.writeByte(YamlConfig.config.server.ENABLE_PIN && !c.canBypassPin() ? 0 : 1); // 0 = Pin-System Enabled, 1 = Disabled
-        p.writeByte(YamlConfig.config.server.ENABLE_PIC && !c.canBypassPic() ? (c.getPic() == null || c.getPic().equals("") ? 0 : 1) : 2); // 0 = Register PIC, 1 = Ask for PIC, 2 = Disabled
+        p.writeLong(0); // dwHighDateTime
+//        p.writeInt(1); // 1: Remove the "Select the world you want to play in"
+//        p.writeByte(1);
+//        p.writeByte(YamlConfig.config.server.ENABLE_PIN && !c.canBypassPin() ? 0 : 1); // 0 = Pin-System Enabled, 1 = Disabled
+//        p.writeByte(YamlConfig.config.server.ENABLE_PIC && !c.canBypassPic() ? (c.getPic() == null || c.getPic().equals("") ? 0 : 1) : 2); // 0 = Register PIC, 1 = Ask for PIC, 2 = Disabled
 
         return p;
     }
@@ -857,9 +893,11 @@ public class PacketCreator {
         for (MapleCharacter chr : chars) {
             addCharEntry(p, chr, false);
         }
-
         p.writeByte(YamlConfig.config.server.ENABLE_PIC && !c.canBypassPic() ? (c.getPic() == null || c.getPic().equals("") ? 0 : 1) : 2);
+//        p.writeByte(1);
         p.writeInt(YamlConfig.config.server.COLLECTIVE_CHARSLOT ? chars.size() + c.getAvailableCharacterSlots() : c.getCharacterSlots());
+//        p.writeByte(0);
+        p.writeInt(0); // buycharcount
         return p;
     }
 
@@ -921,14 +959,22 @@ public class PacketCreator {
      */
     public static Packet getCharInfo(MapleCharacter chr) {
         final OutPacket p = OutPacket.create(SendOpcode.SET_FIELD);
-        p.writeInt(chr.getClient().getChannel() - 1);
-        p.writeByte(1);
-        p.writeByte(1);
         p.writeShort(0);
+        p.writeInt(chr.getClient().getChannel() - 1);
+        p.writeInt(0); // world
+        p.writeByte(1); // sNotifierMessage._m_pStr
+        p.writeByte(1); // bCharacterData
+        p.writeShort(0); //nNotifierCheck, loops
         for (int i = 0; i < 3; i++) {
             p.writeInt(Randomizer.nextInt());
         }
         addCharacterInfo(p, chr);
+        //setlogoutgiftComplete
+        p.writeInt(0); //bPredictQuit
+        p.writeInt(0); // idk
+
+        p.writeInt(0); //dwposmap or something
+        p.writeInt(0);
         p.writeLong(getTime(System.currentTimeMillis()));
         return p;
     }
@@ -969,7 +1015,7 @@ public class PacketCreator {
         for (Pair<MapleStat, Integer> statupdate : mystats) {
             if (statupdate.getLeft().getValue() >= 1) {
                 if (statupdate.getLeft().getValue() == 0x1) {
-                    p.writeByte(statupdate.getRight().byteValue());
+                    p.writeShort(statupdate.getRight().shortValue());
                 } else if (statupdate.getLeft().getValue() <= 0x4) {
                     p.writeInt(statupdate.getRight());
                 } else if (statupdate.getLeft().getValue() < 0x20) {
@@ -980,15 +1026,17 @@ public class PacketCreator {
                     } else {
                         p.writeShort(statupdate.getRight().shortValue());
                     }
+                } else if (statupdate.getLeft().getValue() >= 0x400 && statupdate.getLeft().getValue() <= 0x2000) {
+                    p.writeInt(statupdate.getRight().intValue());
                 } else if (statupdate.getLeft().getValue() < 0xFFFF) {
-                    p.writeShort(statupdate.getRight().shortValue());
-                } else if (statupdate.getLeft().getValue() == 0x20000) {
                     p.writeShort(statupdate.getRight().shortValue());
                 } else {
                     p.writeInt(statupdate.getRight());
                 }
             }
         }
+        p.writeByte(0); // 0.88
+        p.writeByte(0); // 0.94
         return p;
     }
 

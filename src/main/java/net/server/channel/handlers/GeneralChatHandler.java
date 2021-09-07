@@ -32,44 +32,45 @@ import tools.LogHelper;
 import tools.PacketCreator;
 import tools.data.input.SeekableLittleEndianAccessor;
 
-public final class GeneralChatHandler extends AbstractMaplePacketHandler {    
-	@Override
-        public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-                String s = slea.readMapleAsciiString();
-                MapleCharacter chr = c.getPlayer();
-                if(chr.getAutobanManager().getLastSpam(7) + 200 > currentServerTime()) {
-                        c.sendPacket(PacketCreator.enableActions());
-                        return;
-                }
-                if (s.length() > Byte.MAX_VALUE && !chr.isGM()) {
-                        AutobanFactory.PACKET_EDIT.alert(c.getPlayer(), c.getPlayer().getName() + " tried to packet edit in General Chat.");
-                        FilePrinter.printError(FilePrinter.EXPLOITS + c.getPlayer().getName() + ".txt", c.getPlayer().getName() + " tried to send text with length of " + s.length());
-                        c.disconnect(true, false);
-                        return;
-                }
-                char heading = s.charAt(0);
-                if (CommandsExecutor.isCommand(c, s)) {
-                        CommandsExecutor.getInstance().handle(c, s);
-                } else if (heading != '/') {
-                        int show = slea.readByte();
-                        if(chr.getMap().isMuted() && !chr.isGM()) {
-                                chr.dropMessage(5, "The map you are in is currently muted. Please try again later.");
-                                return;
-                        }
-
-                        if (!chr.isHidden()) {
-                                chr.getMap().broadcastMessage(PacketCreator.getChatText(chr.getId(), s, chr.getWhiteChat(), show));
-                                if (YamlConfig.config.server.USE_ENABLE_CHAT_LOG) {
-                                        LogHelper.logChat(c, "General", s);
-                                }
-                        } else {
-                                chr.getMap().broadcastGMMessage(PacketCreator.getChatText(chr.getId(), s, chr.getWhiteChat(), show));
-                                if (YamlConfig.config.server.USE_ENABLE_CHAT_LOG) {
-                                        LogHelper.logChat(c, "GM General", s);
-                                }
-                        }
-
-                        chr.getAutobanManager().spam(7);
-                }
+public final class GeneralChatHandler extends AbstractMaplePacketHandler {
+    @Override
+    public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
+        slea.readInt();
+        String s = slea.readMapleAsciiString();
+        MapleCharacter chr = c.getPlayer();
+        if (chr.getAutobanManager().getLastSpam(7) + 200 > currentServerTime()) {
+            c.sendPacket(PacketCreator.enableActions());
+            return;
         }
+        if (s.length() > Byte.MAX_VALUE && !chr.isGM()) {
+            AutobanFactory.PACKET_EDIT.alert(c.getPlayer(), c.getPlayer().getName() + " tried to packet edit in General Chat.");
+            FilePrinter.printError(FilePrinter.EXPLOITS + c.getPlayer().getName() + ".txt", c.getPlayer().getName() + " tried to send text with length of " + s.length());
+            c.disconnect(true, false);
+            return;
+        }
+        char heading = s.charAt(0);
+        if (CommandsExecutor.isCommand(c, s)) {
+            CommandsExecutor.getInstance().handle(c, s);
+        } else if (heading != '/') {
+            int show = slea.readByte();
+            if (chr.getMap().isMuted() && !chr.isGM()) {
+                chr.dropMessage(5, "The map you are in is currently muted. Please try again later.");
+                return;
+            }
+
+            if (!chr.isHidden()) {
+                chr.getMap().broadcastMessage(PacketCreator.getChatText(chr.getId(), s, chr.getWhiteChat(), show));
+                if (YamlConfig.config.server.USE_ENABLE_CHAT_LOG) {
+                    LogHelper.logChat(c, "General", s);
+                }
+            } else {
+                chr.getMap().broadcastGMMessage(PacketCreator.getChatText(chr.getId(), s, chr.getWhiteChat(), show));
+                if (YamlConfig.config.server.USE_ENABLE_CHAT_LOG) {
+                    LogHelper.logChat(c, "GM General", s);
+                }
+            }
+
+            chr.getAutobanManager().spam(7);
+        }
+    }
 }

@@ -53,8 +53,9 @@ public final class CreateCharHandler extends AbstractMaplePacketHandler {
 
 	@Override
 	public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-                String name = slea.readMapleAsciiString();
-                int job = slea.readInt();
+		String name = slea.readMapleAsciiString();
+		int job = slea.readInt();
+		int subJob = slea.readShort();
 		int face = slea.readInt();
 
 		int hair = slea.readInt();
@@ -65,16 +66,16 @@ public final class CreateCharHandler extends AbstractMaplePacketHandler {
 		int bottom = slea.readInt();
 		int shoes = slea.readInt();
 		int weapon = slea.readInt();
-                int gender = slea.readByte();
+		int gender = slea.readByte();
                 
                 int [] items = new int [] {weapon, top, bottom, shoes, hair, face};
-		for (int item : items) {
-			if (!isLegal(item)) {
-				FilePrinter.printError(FilePrinter.EXPLOITS + name + ".txt", "Owner from account '" + c.getAccountName() + "' tried to packet edit in char creation.");
-				c.disconnect(true, false);
-				return;
-			}
-		}
+//		for (int item : items) {
+//			if (!isLegal(item)) {
+//				FilePrinter.printError(FilePrinter.EXPLOITS + name + ".txt", "Owner from account '" + c.getAccountName() + "' tried to packet edit in char creation.");
+//				c.disconnect(true, false);
+//				return;
+//			}
+//		}
                 
                 int status;
                 if (job == 0) { // Knights of Cygnus
