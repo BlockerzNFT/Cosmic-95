@@ -59,7 +59,7 @@ public enum RecvOpcode {
     ENTER_CASHSHOP(0x2B), // 95
     MOVE_PLAYER(0x2C),
     CANCEL_CHAIR(0x2A),
-    USE_CHAIR(0x2B),
+    USE_CHAIR(0x2D), // 95
     CLOSE_RANGE_ATTACK(0x2F),
     RANGED_ATTACK(0x30),
     MAGIC_ATTACK(0x31),
@@ -74,7 +74,7 @@ public enum RecvOpcode {
     MONSTER_BOOK_COVER(0x39),
     NPC_TALK(0x3F), // v95
     REMOTE_STORE(0x3B),
-    NPC_TALK_MORE(0x3C),
+    NPC_TALK_MORE(0xF1),
     NPC_SHOP(0x3D),
     STORAGE(0x3E),
     HIRED_MERCHANT_REQUEST(0x3F),
@@ -103,7 +103,7 @@ public enum RecvOpcode {
     AUTO_DISTRIBUTE_AP(0x63), //95
     HEAL_OVER_TIME(0x64), // 95
     DISTRIBUTE_SP(0x66), //95
-    SPECIAL_MOVE(0x5B),
+    SPECIAL_MOVE(0x67), // 95
     CANCEL_BUFF(0x5C),
     SKILL_EFFECT(0x5D),
     MESO_DROP(0x6A), //95
@@ -113,7 +113,7 @@ public enum RecvOpcode {
     CANCEL_DEBUFF(0x63),
     CHANGE_MAP_SPECIAL(-1), // TODO figure out
     USE_INNER_PORTAL(0x65),
-    TROCK_ADD_MAP(0x66),
+    TROCK_ADD_MAP(-1),
     REPORT(0x6A),
     QUEST_ACTION(0x6B),
     //USER_CALC_DAMAGE_STAT_SET_REQUEST(0x6C),
